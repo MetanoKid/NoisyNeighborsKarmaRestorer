@@ -1,9 +1,9 @@
 module.exports = function (app) {
 	// GET routes
-	
+
 	app.get("/", function (request, response) {
 		// because server is running, it's always okay
-		response.status(200).send();
+		response.status(418).send();
 	});
 
 	// POST routes
