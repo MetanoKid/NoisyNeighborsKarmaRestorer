@@ -6,6 +6,10 @@ module.exports = function (app) {
 		response.status(418).send();
 	});
 
+	app.get("/songs", function (request, response) {
+		response.status(501).send();
+	});
+
 	// POST routes
 
 	app.post("/play", function (request, response) {
@@ -13,6 +17,14 @@ module.exports = function (app) {
 	});
 
 	app.post("/stop", function (request, response) {
+		response.status(501).send();
+	});
+
+	app.post("/limit_time", function (request, response) {
+		response.status(501).send();
+	});
+
+	app.post("/volume", function (request, response) {
 		response.status(501).send();
 	});
 };
