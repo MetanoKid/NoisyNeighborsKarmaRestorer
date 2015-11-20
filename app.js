@@ -5,9 +5,7 @@ var express = require("express");
 var app = express();
 
 // routing
-app.get("/", function (request, response) {
-	response.send("Everything's working!");
-});
+require("./routes.js")(app);
 
 // start server
 var server = app.listen(1337, function() {
