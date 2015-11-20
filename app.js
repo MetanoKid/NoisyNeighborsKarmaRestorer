@@ -1,8 +1,12 @@
 // dependencies
 var express = require("express");
+var bodyParser = require("body-parser");
 
 // systems we'll be using
 var app = express();
+
+// enable JSON parsing
+app.use(bodyParser.json());
 
 // routing
 require("./routes.js")(app);

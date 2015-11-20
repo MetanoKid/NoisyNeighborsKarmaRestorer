@@ -18,6 +18,7 @@
   "homepage": "https://github.com/MetanoKid/NoisyNeighborsKarmaRestorer#readme",
   "dependencies": {
     "player": "^0.6.1",
-    "express": "~4.13.3"
+    "express": "~4.13.3",
+    "body-parser": "~1.14.1"
   }
 }
