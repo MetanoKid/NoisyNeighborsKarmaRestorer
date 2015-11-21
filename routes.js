@@ -1,4 +1,6 @@
-module.exports = function (app) {
+"use strict";
+
+module.exports = function (app, karmaBalancer) {
 	// GET routes
 
 	app.get("/", function (request, response) {
@@ -13,11 +15,15 @@ module.exports = function (app) {
 	// POST routes
 
 	app.post("/play", function (request, response) {
-		response.status(501).send();
+		karmaBalancer.findEquilibrium({});
+
+		response.status(201).send();
 	});
 
 	app.post("/stop", function (request, response) {
-		response.status(501).send();
+		karmaBalancer.stopFindingEquilibrium();
+
+		response.status(200).send();
 	});
 
 	app.post("/limit_time", function (request, response) {
@@ -25,6 +31,8 @@ module.exports = function (app) {
 	});
 
 	app.post("/volume", function (request, response) {
-		response.status(501).send();
+		karmaBalancer.modulateEquilibrium(request.body.volume);
+
+		response.status(200).send();
 	});
 };
