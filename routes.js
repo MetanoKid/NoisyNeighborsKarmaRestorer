@@ -9,15 +9,16 @@ module.exports = function (app, karmaBalancer) {
 	});
 
 	app.get("/songs", function (request, response) {
-		response.status(501).send();
+		var songs = karmaBalancer.listEquilibriumProviders();
+		response.status(200).send(songs);
 	});
 
 	// POST routes
 
 	app.post("/play", function (request, response) {
-		karmaBalancer.findEquilibrium({});
+		var couldPlay = karmaBalancer.findEquilibrium(request.body);
 
-		response.status(201).send();
+		response.status(couldPlay ? 201 : 400).send();
 	});
 
 	app.post("/stop", function (request, response) {

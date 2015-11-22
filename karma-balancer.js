@@ -4,6 +4,15 @@
 Balances Karma by playing sound files in time intervals.
 */
 var KarmaBalancer = (function () {
+	// we need to have access to String.endsWith
+	// taken from: http://stackoverflow.com/a/2548133
+	String.prototype.endsWith = function(suffix) {
+		return this.indexOf(suffix, this.length - suffix.length) !== -1;
+	};
+
+	// access file system
+	var fs = require("fs");
+
 	// Player's configuration
 	var Player = require("player");
 	var player = new Player();
@@ -14,7 +23,10 @@ var KarmaBalancer = (function () {
 		console.log("PlayEnd:", item);
 	}).on("playing", function (item) {
 		console.log("Playing:", item);
-	});	
+	});
+
+	// path to songs
+	var pathToKarmaBalancers = "karma_balancers/";
 
 	var KarmaBalancer = function () {
 		
@@ -38,10 +50,23 @@ var KarmaBalancer = (function () {
 		// stop it if it was running
 		this.stopFindingEquilibrium();
 
-		player.add("demo.mp3");
-		player.play();
+		// does the file even exist?
+		try {
+			var path = pathToKarmaBalancers + params.song;
+			// it could be a directory ending with .mp3 (who knows)
+			if(fs.statSync(path).isFile()) {
+				player.add(path);
+				player.play();
 
-		// TODO: set up timeout for next playback
+				// TODO: set up timeout for next playback
+
+				return true;
+			}
+		} catch (ex) {
+			// oops! it doesn't exist!
+		}
+		
+		return false;
 	};
 
 	/**
@@ -56,6 +81,16 @@ var KarmaBalancer = (function () {
 		}
 
 		player.setVolume(volume);
+	};
+
+	/**
+	Returns a list of songs in the playback directory.
+	*/
+	KarmaBalancer.prototype.listEquilibriumProviders = function () {
+		return fs.readdirSync(pathToKarmaBalancers).filter(function (fileName) {
+			console.log("File:", fileName);
+			return fileName.endsWith(".mp3");
+		});
 	};
 
 	return KarmaBalancer;
