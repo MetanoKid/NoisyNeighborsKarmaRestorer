@@ -29,7 +29,10 @@ var KarmaBalancer = (function () {
 	var pathToKarmaBalancers = "karma_balancers/";
 
 	var KarmaBalancer = function () {
-		
+		this.timeouts = {
+			duration: {},
+			interval: {}
+		};
 	};
 
 	/**
@@ -38,7 +41,16 @@ var KarmaBalancer = (function () {
 	KarmaBalancer.prototype.stopFindingEquilibrium = function () {
 		player.stop();
 
-		// TODO: stop timeout for next song, if any
+		// remove all timeouts, if any
+		if(this.timeouts.duration.timeoutFunction !== undefined) {
+			clearTimeout(this.timeouts.duration.timeoutFunction);
+			this.timeouts.duration = {};
+		}
+
+		if(this.timeouts.interval.timeoutFunction !== undefined) {
+			clearTimeout(this.timeouts.interval.timeoutFunction);
+			this.timeouts.interval = {};
+		}
 	};
 
 	/**
@@ -58,7 +70,11 @@ var KarmaBalancer = (function () {
 				player.add(path);
 				player.play();
 
-				// TODO: set up timeout for next playback
+				// keep track of last played song
+				this.lastSong = params.song;
+
+				// create timeouts to stop song and play again
+				this.setTimeouts(params.duration, params.interval);
 
 				return true;
 			}
@@ -88,8 +104,46 @@ var KarmaBalancer = (function () {
 	*/
 	KarmaBalancer.prototype.listEquilibriumProviders = function () {
 		return fs.readdirSync(pathToKarmaBalancers).filter(function (fileName) {
-			console.log("File:", fileName);
 			return fileName.endsWith(".mp3");
+		});
+	};
+
+	/**
+	Schedules song playback, stop and replay.
+	*/
+	KarmaBalancer.prototype.setTimeouts = function (duration, interval) {
+		var that = this;
+
+		this.timeouts.duration = {
+			time: duration,
+			timeoutFunction: setTimeout(function () {
+				that.stopCurrentEquilibrium();
+			}, duration * 1000)
+		};
+
+		this.timeouts.interval = {
+			time: interval,
+			timeoutFunction: setTimeout(function () {
+				that.findEquilibriumAgain();
+			}, interval * 1000)
+		};
+	};
+
+	/**
+	Stop current playback but keep timeouts.
+	*/
+	KarmaBalancer.prototype.stopCurrentEquilibrium = function () {
+		player.stop();
+	};
+
+	/**
+	Replay last song.
+	*/
+	KarmaBalancer.prototype.findEquilibriumAgain = function () {
+		this.findEquilibrium({
+			song: this.lastSong,
+			duration: this.timeouts.duration.time,
+			interval: this.timeouts.interval.time
 		});
 	};
 
