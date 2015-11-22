@@ -5,7 +5,9 @@ module.exports = function (app, karmaBalancer) {
 
 	app.get("/", function (request, response) {
 		// because server is running, it's always okay
-		response.status(418).send();
+		response.status(200).send({
+			running: karmaBalancer.isFindingEquilibrium()
+		});
 	});
 
 	app.get("/songs", function (request, response) {
@@ -28,7 +30,9 @@ module.exports = function (app, karmaBalancer) {
 	});
 
 	app.post("/limit_time", function (request, response) {
-		response.status(501).send();
+		karmaBalancer.setDateToStop(request.body.timeToStop);
+
+		response.status(201).send();
 	});
 
 	app.post("/volume", function (request, response) {

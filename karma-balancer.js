@@ -51,6 +51,11 @@ var KarmaBalancer = (function () {
 			clearTimeout(this.timeouts.interval.timeoutFunction);
 			this.timeouts.interval = {};
 		}
+
+		// clear date to stop
+		this.dateToStop = undefined;
+
+		console.log("Stopped playback and timeouts.");
 	};
 
 	/**
@@ -67,20 +72,38 @@ var KarmaBalancer = (function () {
 			var path = pathToKarmaBalancers + params.song;
 			// it could be a directory ending with .mp3 (who knows)
 			if(fs.statSync(path).isFile()) {
+				// play song
 				player.add(path);
 				player.play();
 
 				// keep track of last played song
 				this.lastSong = params.song;
 
+				// time to stop
+				if(params.timeToStop !== undefined) {
+					this.setDateToStop(params.timeToStop);
+				} else if(this.dateToStop !== undefined) {
+					// we keep it!
+				} else {
+					params.timeToStop = {
+						hours: 23,
+						minutes: 59
+					};
+					this.setDateToStop(params.timeToStop);
+				}
+
 				// create timeouts to stop song and play again
 				this.setTimeouts(params.duration, params.interval);
+
+				console.log("Starts playback and timeouts.");
 
 				return true;
 			}
 		} catch (ex) {
 			// oops! it doesn't exist!
 		}
+
+		console.log("Can't find song %s", params.song);
 		
 		return false;
 	};
@@ -97,6 +120,8 @@ var KarmaBalancer = (function () {
 		}
 
 		player.setVolume(volume);
+
+		console.log("Modified volume to %f.", volume);
 	};
 
 	/**
@@ -113,6 +138,14 @@ var KarmaBalancer = (function () {
 	*/
 	KarmaBalancer.prototype.setTimeouts = function (duration, interval) {
 		var that = this;
+
+		if(duration === undefined) {
+			duration = 60.0;
+		}
+
+		if(interval === undefined) {
+			interval = 60 * 60;
+		}
 
 		this.timeouts.duration = {
 			time: duration,
@@ -134,17 +167,67 @@ var KarmaBalancer = (function () {
 	*/
 	KarmaBalancer.prototype.stopCurrentEquilibrium = function () {
 		player.stop();
+
+		console.log("Stopped current playback.");
 	};
 
 	/**
-	Replay last song.
+	Replay last song with the same parameters.
 	*/
 	KarmaBalancer.prototype.findEquilibriumAgain = function () {
-		this.findEquilibrium({
-			song: this.lastSong,
-			duration: this.timeouts.duration.time,
-			interval: this.timeouts.interval.time
-		});
+		// got to stop?
+		if(new Date() > this.dateToStop) {
+			this.stopFindingEquilibrium();
+		} else {
+			this.findEquilibrium({
+				song: this.lastSong,
+				duration: this.timeouts.duration.time,
+				interval: this.timeouts.interval.time,
+				timeToStop: {
+					hours: this.dateToStop.getHours(),
+					minutes: this.dateToStop.getMinutes()
+				}
+			});
+		}
+	};
+
+	/**
+	Checks if it's running (might not be playing at the moment, but
+	it's scheduled).
+	*/
+	KarmaBalancer.prototype.isFindingEquilibrium = function () {
+		var hasDuration = this.timeouts.duration !== undefined &&
+						  this.timeouts.duration.timeoutFunction !== undefined;
+		var hasInterval = this.timeouts.interval !== undefined &&
+						  this.timeouts.interval.timeoutFunction !== undefined;
+
+		return hasDuration && hasInterval;
+	};
+
+	/**
+	Sets the maximum date at which we'll stop balancing karma.
+	*/
+	KarmaBalancer.prototype.setDateToStop = function (data) {
+		// even more clear than the "variable = variable || default"
+		// or the shorter "variable || (variable = default)"
+		if(data === undefined) {
+			data = {};
+		}
+		if(data.hours === undefined) {
+			data.hours = 23;
+		}
+		if(data.hours === undefined) {
+			data.minutes = 59;
+		}
+
+		var currentDate = new Date();
+		currentDate.setHours(data.hours);
+		currentDate.setMinutes(data.minutes);
+		currentDate.setSeconds(0);
+
+		this.dateToStop = currentDate;
+
+		console.log("Set date to stop:", this.dateToStop);
 	};
 
 	return KarmaBalancer;
