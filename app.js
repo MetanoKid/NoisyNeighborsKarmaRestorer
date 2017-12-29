@@ -4,6 +4,7 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var KarmaBalancer = require("./karma-balancer.js");
+var ip = require("ip");
 
 // systems we'll be using
 var app = express();
@@ -16,9 +17,7 @@ app.use(bodyParser.json());
 require("./routes.js")(app, karmaBalancer);
 
 // start server
-var server = app.listen(1337, function() {
-	var host = server.address().address;
-	var port = server.address().port;
-
-	console.log("NoisyNeighborsKarmaRestorer listening at http://%s:%s", host, port);
+const port = 1337;
+var server = app.listen(port, function() {
+	console.log(`NoisyNeighborsKarmaRestorer listening at http://${ip.address()}:${port}`);
 });

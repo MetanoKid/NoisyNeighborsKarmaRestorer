@@ -55,6 +55,10 @@ var KarmaBalancer = (function () {
 		// clear date to stop
 		this.dateToStop = undefined;
 
+		// we need a new playlist but the Player class doesn't expose any
+		// way of clearing its internal list. So, create a new Player
+		player = new Player();
+
 		console.log("Stopped playback and timeouts.");
 	};
 
