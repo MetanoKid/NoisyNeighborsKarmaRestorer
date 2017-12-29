@@ -1,9 +1,11 @@
 {
   "name": "noisy-neighbors-karma-restorer",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Restore karma between your noisy neighbors and you, even when not at home!",
   "main": "app.js",
-  "scripts": {},
+  "scripts": {
+    "start": "node app.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MetanoKid/NoisyNeighborsKarmaRestorer.git"
@@ -17,6 +19,7 @@
   "dependencies": {
     "body-parser": "~1.14.1",
     "express": "~4.13.3",
+    "ip": "^1.1.5",
     "player": "metanokid/player"
   }
 }
