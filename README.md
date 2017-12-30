@@ -76,7 +76,7 @@ It is a Node.js application that uses Express to spawn a server and a REST API t
 
   Response:
 
-    201 Created
+    200 OK
 
   * POST /volume
 
@@ -88,4 +88,4 @@ It is a Node.js application that uses Express to spawn a server and a REST API t
 
   Response:
 
-    201 Created
+    200 OK
