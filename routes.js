@@ -38,6 +38,6 @@ module.exports = function (app, karmaBalancer) {
 	app.post("/volume", function (request, response) {
 		karmaBalancer.modulateEquilibrium(request.body.volume);
 
-		response.status(200).send();
+		response.status(201).send();
 	});
 };
