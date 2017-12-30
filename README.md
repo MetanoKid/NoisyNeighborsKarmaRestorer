@@ -89,3 +89,7 @@ It is a Node.js application that uses Express to spawn a server and a REST API t
   Response:
 
     200 OK
+
+## Motivation
+
+I also wrote about this project in my personal blog [here](http://coding-scars.com/noisy-neighbors-karma-restorer).
